@@ -1,0 +1,186 @@
+import pygame
+import random
+import time
+
+siz = 50
+WIDTH = 10
+HEIGHT = 10
+MARGIN = 5
+one1 = []
+one2 = []
+WINDOW_SIZE = ((WIDTH + MARGIN) * siz + MARGIN, ((HEIGHT + MARGIN) * siz + MARGIN) + 100)
+dis = pygame.display.set_mode(WINDOW_SIZE)
+pygame.display.set_caption("My Game")
+for row1 in range(siz):
+    one1.append([])
+    for col1 in range(siz):
+        one1[row1].append(0)
+for row1 in range(siz):
+    one2.append([])
+    for col1 in range(siz):
+        one2[row1].append(0)
+pygame.init()
+font = pygame.font.SysFont(None, 50)
+game_over = False
+game_end = False
+game_start = False
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREEN = (0, 255, 0)
+RED = (225, 0, 50)
+GRAY = (125,125,125)
+ORANGE = (255, 136, 0)
+temperature = 30
+temperature_increment = 0.5
+
+def random_generate():
+    for row1 in range(siz):
+        for col1 in range(siz):
+            if random.randint(1, 100) == 1:  # Вероятность 1/5
+                group_size = random.randint(3, 10)
+                for i in range(group_size):
+                    row2 = row1 + random.randint(-1, 1)
+                    col2 = col1 + random.randint(-1, 1)
+                    if (0 <= row2 < siz) and (0 <= col2 < siz):
+                        one1[row2][col2] = 1
+            if random.randint(1, 100) == 2:  # Вероятность 1/5
+                group_size = random.randint(3, 10)
+                for i in range(group_size):
+                    row2 = row1 + random.randint(-1, 1)
+                    col2 = col1 + random.randint(-1, 1)
+                    if (0 <= row2 < siz) and (0 <= col2 < siz):
+                        one1[row2][col2] = 2
+            if random.randint(1, 100) == 3:  # Вероятность 1/5
+                group_size = random.randint(3, 10)
+                for i in range(group_size):
+                    row2 = row1 + random.randint(-1, 1)
+                    col2 = col1 + random.randint(-1, 1)
+                    if (0 <= row2 < siz) and (0 <= col2 < siz):
+                        one1[row2][col2] = 3
+            if random.randint(1, 100) == 4:  # Вероятность 1/5
+                group_size = random.randint(3, 10)
+                for i in range(group_size):
+                    row2 = row1 + random.randint(-1, 1)
+                    col2 = col1 + random.randint(-1, 1)
+                    if (0 <= row2 < siz) and (0 <= col2 < siz):
+                        one1[row2][col2] = 4
+            if random.randint(1, 100) == 5:  # Вероятность 1/5
+                group_size = random.randint(3, 10)
+                for i in range(group_size):
+                    row2 = row1 + random.randint(-1, 1)
+                    col2 = col1 + random.randint(-1, 1)
+                    if (0 <= row2 < siz) and (0 <= col2 < siz):
+                        one1[row2][col2] = 5
+
+def fill(one1):
+    for row1 in range(siz):
+        for col1 in range(siz):
+            if one1[row1][col1] == 1:
+                pygame.draw.rect(dis, GREEN, (col1 * (WIDTH + MARGIN) + MARGIN, row1 * (HEIGHT + MARGIN) + MARGIN, WIDTH, HEIGHT))
+            elif one1[row1][col1] == 2:
+                pygame.draw.rect(dis, ORANGE, (col1 * (WIDTH + MARGIN) + MARGIN, row1 * (HEIGHT + MARGIN) + MARGIN, WIDTH, HEIGHT))
+            elif one1[row1][col1] == 3:
+                pygame.draw.rect(dis, RED, (col1 * (WIDTH + MARGIN) + MARGIN, row1 * (HEIGHT + MARGIN) + MARGIN, WIDTH, HEIGHT))
+            elif one1[row1][col1] == 4:
+                pygame.draw.rect(dis, GRAY, (col1 * (WIDTH + MARGIN) + MARGIN, row1 * (HEIGHT + MARGIN) + MARGIN, WIDTH, HEIGHT))
+            elif one1[row1][col1] == 5:
+                pygame.draw.rect(dis, WHITE, (col1 * (WIDTH + MARGIN) + MARGIN, row1 * (HEIGHT + MARGIN) + MARGIN, WIDTH, HEIGHT))
+            else:
+                pygame.draw.rect(dis, BLACK, (col1 * (WIDTH + MARGIN) + MARGIN, row1 * (HEIGHT + MARGIN) + MARGIN, WIDTH, HEIGHT))
+
+def check(one1, one2):
+    for row in range(siz):
+        for col in range(siz):
+            live_neighbors = 0
+            # Проверяем соседей вокруг клетки
+            for i in range(row-1, row+2):
+                for j in range(col-1, col+2):
+                    # Игнорируем саму клетку
+                    if (i == row) and (j == col):
+                        continue
+                    # Проверяем, находится ли клетка в пределах массива
+                    if (i >= 0) and (i < len(one1)) and (j >= 0) and (j < len(one1[0])):
+                        # Если значение клетки равно 1, увеличиваем счетчик живых соседей
+                        if one1[i][j] == 1 or one1[i][j] == 2 or one1[i][j] == 3 or one1[i][j] == 4 or one1[i][j] == 5:
+                            live_neighbors += 1
+            if live_neighbors == 3 and one1[row][col] == 0:
+                one2[row][col] = (random.randint(1, 5))
+            elif (live_neighbors == 3 or live_neighbors == 2) and (one1[row][col] == 1 or one1[row][col] == 2 or one1[row][col] == 3 or one1[row][col] == 4 or one1[row][col] == 5):
+                one2[row][col] = (random.randint(1, 5))
+            elif (live_neighbors > 3 or live_neighbors < 2) and (one1[row][col] == 1 or one1[row][col] == 2 or one1[row][col] == 3 or one1[row][col] == 4 or one1[row][col] == 5):
+                one2[row][col] = 0
+    return one2
+
+def temp():
+    dis.fill(BLACK)
+    temperature_text = font.render(f"Temperature: {temperature} °C", True, WHITE)
+    temperature_text_rect = temperature_text.get_rect(center=(((WIDTH + MARGIN) * siz + MARGIN) // 2, ((HEIGHT + MARGIN) * siz + MARGIN) + 50))
+    dis.blit(temperature_text, temperature_text_rect)
+    pygame.display.update()
+
+
+random_generate()
+while not game_end:
+    while not game_start:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_start = True
+                game_over = True
+            if event.type == pygame.MOUSEBUTTONUP:
+                pos = pygame.mouse.get_pos()
+                col1 = pos[0] // (WIDTH + MARGIN)
+                row1 = pos[1] // (HEIGHT + MARGIN)
+                if row1 < siz and col1 < siz:
+                    if one1[row1][col1] == 1:
+                        one1[row1][col1] = 0
+                    else:
+                        one1[row1][col1] = 1
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    game_start = True
+                    game_over = False
+                elif event.key == pygame.K_LEFT:
+                    temperature -= temperature_increment
+                    if temperature < -50:
+                        temperature = -50
+                    temp()
+                elif event.key == pygame.K_RIGHT:
+                    temperature += temperature_increment
+                    if temperature > 100:
+                        temperature = 100
+                    temp()
+        fill(one1)
+        temperature_text = font.render(f"Temperature: {temperature} °C", True, WHITE)
+        temperature_text_rect = temperature_text.get_rect(
+            center=(((WIDTH + MARGIN) * siz + MARGIN) // 2, ((HEIGHT + MARGIN) * siz + MARGIN) + 50))
+        dis.blit(temperature_text, temperature_text_rect)
+        pygame.display.update()
+
+    while not game_over:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    game_start = False
+                    game_over = True
+                elif event.key == pygame.K_LEFT:
+                    temperature -= temperature_increment
+                    if temperature < -50:
+                        temperature = -50
+                    temp()
+                elif event.key == pygame.K_RIGHT:
+                    temperature += temperature_increment
+                    if temperature > 100:
+                        temperature = 100
+                    temp()
+
+        check(one1, one2)
+        if one1 != one2:
+            one1 = one2
+            one2 = [[0 for col in range(siz)] for row in range(siz)]
+            fill(one1)
+        pygame.display.update()
+        time.sleep(0.5)
+pygame.quit()
+quit()
