@@ -32,6 +32,7 @@ GRAY = (125,125,125)
 ORANGE = (255, 136, 0)
 temperature = 30
 temperature_increment = 0.5
+born_chance_increment = 100
 
 def random_generate():
     for row1 in range(siz):
@@ -91,7 +92,11 @@ def fill(one1):
 def check(one1, one2):
     for row in range(siz):
         for col in range(siz):
-            live_neighbors = 0
+            base_neighbors = 0
+            friendly_neighbors = 0
+            virus_neighbors = 0
+            healing_neighbors = 0
+            neitral_neighbors = 0
             # Проверяем соседей вокруг клетки
             for i in range(row-1, row+2):
                 for j in range(col-1, col+2):
@@ -101,13 +106,45 @@ def check(one1, one2):
                     # Проверяем, находится ли клетка в пределах массива
                     if (i >= 0) and (i < len(one1)) and (j >= 0) and (j < len(one1[0])):
                         # Если значение клетки равно 1, увеличиваем счетчик живых соседей
-                        if one1[i][j] == 1 or one1[i][j] == 2 or one1[i][j] == 3 or one1[i][j] == 4 or one1[i][j] == 5:
-                            live_neighbors += 1
-            if live_neighbors == 3 and one1[row][col] == 0:
-                one2[row][col] = (random.randint(1, 5))
-            elif (live_neighbors == 3 or live_neighbors == 2) and (one1[row][col] == 1 or one1[row][col] == 2 or one1[row][col] == 3 or one1[row][col] == 4 or one1[row][col] == 5):
-                one2[row][col] = (random.randint(1, 5))
-            elif (live_neighbors > 3 or live_neighbors < 2) and (one1[row][col] == 1 or one1[row][col] == 2 or one1[row][col] == 3 or one1[row][col] == 4 or one1[row][col] == 5):
+                        if one1[i][j] == 1:
+                            base_neighbors += 1
+                        elif one1[i][j] == 2:
+                            friendly_neighbors += 1
+                        elif one1[i][j] == 3:
+                            virus_neighbors += 1
+                        elif one1[i][j] == 4:
+                            healing_neighbors += 1
+                        elif one1[i][j] == 5:
+                            neitral_neighbors += 1
+            if base_neighbors == 3 and one1[row][col] == 0:
+                one2[row][col] = 1
+            elif (base_neighbors == 3 or base_neighbors == 2) and one1[row][col] == 1:
+                one2[row][col] = 1
+            elif (base_neighbors > 3 or base_neighbors < 2) and one1[row][col] == 1:
+                one2[row][col] = 0
+            elif friendly_neighbors == 3 and one1[row][col] == 0:
+                one2[row][col] = 2
+            elif (friendly_neighbors == 3 or friendly_neighbors == 2) and one1[row][col] == 2:
+                one2[row][col] = 2
+            elif (friendly_neighbors > 3 or friendly_neighbors < 2) and one1[row][col] == 2:
+                one2[row][col] = 0
+            elif virus_neighbors == 3 and one1[row][col] == 0:
+                one2[row][col] = 3
+            elif (virus_neighbors == 3 or virus_neighbors == 2) and one1[row][col] == 3:
+                one2[row][col] = 3
+            elif (virus_neighbors > 3 or virus_neighbors < 2) and one1[row][col] == 3:
+                one2[row][col] = 0
+            elif healing_neighbors == 3 and one1[row][col] == 0:
+                one2[row][col] = 4
+            elif (healing_neighbors == 3 or healing_neighbors == 2) and one1[row][col] == 4:
+                one2[row][col] = 4
+            elif (healing_neighbors > 3 or healing_neighbors < 2) and one1[row][col] == 4:
+                one2[row][col] = 0
+            elif neitral_neighbors == 3 and one1[row][col] == 0:
+                one2[row][col] = 5
+            elif (neitral_neighbors == 3 or neitral_neighbors == 2) and one1[row][col] == 5:
+                one2[row][col] = 5
+            elif (neitral_neighbors > 3 or neitral_neighbors < 2) and one1[row][col] == 5:
                 one2[row][col] = 0
     return one2
 
