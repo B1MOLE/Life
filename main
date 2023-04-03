@@ -32,46 +32,17 @@ GRAY = (125,125,125)
 ORANGE = (255, 136, 0)
 temperature = 30
 temperature_increment = 0.5
-born_chance_increment = 100
-
+base_born_chance = 100000
 def random_generate():
     for row1 in range(siz):
         for col1 in range(siz):
-            if random.randint(1, 100) == 1:  # Вероятность 1/5
+            if random.randint(1, 50) == 1:  # Вероятность 1/5
                 group_size = random.randint(3, 10)
                 for i in range(group_size):
                     row2 = row1 + random.randint(-1, 1)
                     col2 = col1 + random.randint(-1, 1)
                     if (0 <= row2 < siz) and (0 <= col2 < siz):
                         one1[row2][col2] = 1
-            if random.randint(1, 100) == 2:  # Вероятность 1/5
-                group_size = random.randint(3, 10)
-                for i in range(group_size):
-                    row2 = row1 + random.randint(-1, 1)
-                    col2 = col1 + random.randint(-1, 1)
-                    if (0 <= row2 < siz) and (0 <= col2 < siz):
-                        one1[row2][col2] = 2
-            if random.randint(1, 100) == 3:  # Вероятность 1/5
-                group_size = random.randint(3, 10)
-                for i in range(group_size):
-                    row2 = row1 + random.randint(-1, 1)
-                    col2 = col1 + random.randint(-1, 1)
-                    if (0 <= row2 < siz) and (0 <= col2 < siz):
-                        one1[row2][col2] = 3
-            if random.randint(1, 100) == 4:  # Вероятность 1/5
-                group_size = random.randint(3, 10)
-                for i in range(group_size):
-                    row2 = row1 + random.randint(-1, 1)
-                    col2 = col1 + random.randint(-1, 1)
-                    if (0 <= row2 < siz) and (0 <= col2 < siz):
-                        one1[row2][col2] = 4
-            if random.randint(1, 100) == 5:  # Вероятность 1/5
-                group_size = random.randint(3, 10)
-                for i in range(group_size):
-                    row2 = row1 + random.randint(-1, 1)
-                    col2 = col1 + random.randint(-1, 1)
-                    if (0 <= row2 < siz) and (0 <= col2 < siz):
-                        one1[row2][col2] = 5
 
 def fill(one1):
     for row1 in range(siz):
@@ -88,7 +59,26 @@ def fill(one1):
                 pygame.draw.rect(dis, WHITE, (col1 * (WIDTH + MARGIN) + MARGIN, row1 * (HEIGHT + MARGIN) + MARGIN, WIDTH, HEIGHT))
             else:
                 pygame.draw.rect(dis, BLACK, (col1 * (WIDTH + MARGIN) + MARGIN, row1 * (HEIGHT + MARGIN) + MARGIN, WIDTH, HEIGHT))
+    pygame.display.update()
+    time.sleep(0.5)
 
+def friend():
+    if (temperature <= 25) and (temperature >= 10):
+        friendly_born_chance = 5000
+        for row in range(siz):
+            for col in range(siz):
+                if random.randint(0, friendly_born_chance) == 1:
+                    group_size = random.randint(10, 15)
+                    for i in range(group_size):
+                        row2 = row + random.randint(-1, 1)
+                        col2 = col + random.randint(-1, 1)
+                        if (0 <= row2 < siz) and (0 <= col2 < siz):
+                            one1[row2][col2] = 2
+    elif (temperature > 25) or (temperature < 10):
+        for row in range(siz):
+            for col in range(siz):
+                if one1[row][col] == 2:
+                    one1[row][col] = 0
 def check(one1, one2):
     for row in range(siz):
         for col in range(siz):
@@ -97,6 +87,13 @@ def check(one1, one2):
             virus_neighbors = 0
             healing_neighbors = 0
             neitral_neighbors = 0
+            if random.randint(0, base_born_chance) == 1:
+                group_size = random.randint(3, 10)
+                for i in range(group_size):
+                    row2 = row + random.randint(-1, 1)
+                    col2 = col + random.randint(-1, 1)
+                    if (0 <= row2 < siz) and (0 <= col2 < siz):
+                        one2[row2][col2] = 1
             # Проверяем соседей вокруг клетки
             for i in range(row-1, row+2):
                 for j in range(col-1, col+2):
@@ -122,25 +119,25 @@ def check(one1, one2):
                 one2[row][col] = 1
             elif (base_neighbors > 3 or base_neighbors < 2) and one1[row][col] == 1:
                 one2[row][col] = 0
-            elif friendly_neighbors == 3 and one1[row][col] == 0:
+            if friendly_neighbors == 3 and one1[row][col] == 0:
                 one2[row][col] = 2
-            elif (friendly_neighbors == 3 or friendly_neighbors == 2) and one1[row][col] == 2:
+            elif (friendly_neighbors == 3 or friendly_neighbors == 3) and one1[row][col] == 2:
                 one2[row][col] = 2
             elif (friendly_neighbors > 3 or friendly_neighbors < 2) and one1[row][col] == 2:
                 one2[row][col] = 0
-            elif virus_neighbors == 3 and one1[row][col] == 0:
+            if virus_neighbors == 3 and one1[row][col] == 0:
                 one2[row][col] = 3
             elif (virus_neighbors == 3 or virus_neighbors == 2) and one1[row][col] == 3:
                 one2[row][col] = 3
             elif (virus_neighbors > 3 or virus_neighbors < 2) and one1[row][col] == 3:
                 one2[row][col] = 0
-            elif healing_neighbors == 3 and one1[row][col] == 0:
+            if healing_neighbors == 3 and one1[row][col] == 0:
                 one2[row][col] = 4
             elif (healing_neighbors == 3 or healing_neighbors == 2) and one1[row][col] == 4:
                 one2[row][col] = 4
             elif (healing_neighbors > 3 or healing_neighbors < 2) and one1[row][col] == 4:
                 one2[row][col] = 0
-            elif neitral_neighbors == 3 and one1[row][col] == 0:
+            if neitral_neighbors == 3 and one1[row][col] == 0:
                 one2[row][col] = 5
             elif (neitral_neighbors == 3 or neitral_neighbors == 2) and one1[row][col] == 5:
                 one2[row][col] = 5
@@ -212,12 +209,12 @@ while not game_end:
                         temperature = 100
                     temp()
 
+        friend()
         check(one1, one2)
         if one1 != one2:
             one1 = one2
             one2 = [[0 for col in range(siz)] for row in range(siz)]
             fill(one1)
         pygame.display.update()
-        time.sleep(0.5)
 pygame.quit()
 quit()
