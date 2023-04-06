@@ -33,15 +33,12 @@ ORANGE = (255, 136, 0)
 temperature = 30
 temperature_increment = 1
 base_born_chance = 25000
-low_border_virus = random.randint(-10, 10)
-high_border_virus = random.randint(low_border_virus + 1, 30)
-while (high_border_virus - low_border_virus) <= 5:
-    low_border_virus = random.randint(-10, 10)
-    high_border_virus = random.randint(low_border_virus + 1, 30)
+low_border_virus = random.randint(0, 10)
+high_border_virus = random.randint(low_border_virus + 5, 30)
 low_border_friendly = random.randint(10, 30)
-high_border_friendly = random.randint(low_border_friendly + 1, 50)
+high_border_friendly = random.randint(low_border_friendly + 5, 50)
 low_border_healer = random.randint(0, 10)
-high_border_healer = random.randint(low_border_healer + 1, 35)
+high_border_healer = random.randint(low_border_healer + 5, 35)
 def random_generate():
     for row in range(siz):
         for col in range(siz):
@@ -84,8 +81,8 @@ def friend():
                         if (0 <= row2 < siz) and (0 <= col2 < siz):
                             one1[row2][col2] = 2
 def virus():
-    if (temperature <= high_border_virus) and (temperature >= high_border_virus):
-        virus_born_chance = 1000
+    if (temperature <= high_border_virus) and (temperature >= low_border_virus):
+        virus_born_chance = 50000
         for row in range(siz):
             for col in range(siz):
                 if random.randint(0, virus_born_chance) == 1:
@@ -98,7 +95,7 @@ def virus():
 
 def healer():
     if (temperature <= high_border_healer) and (temperature >= low_border_healer):
-        healer_born_chance = 100000
+        healer_born_chance = 50000
         for row in range(siz):
             for col in range(siz):
                 if random.randint(0, healer_born_chance) == 1:
@@ -145,6 +142,10 @@ def check(one1, one2):
                             neitral_neighbors += 1
             if base_neighbors == 3 and one1[row][col] == 0 and virus_neighbors == 0 and neitral_neighbors == 0:
                 one2[row][col] = 1
+            elif one1[row][col] == 0 and healing_neighbors > 0 and virus_neighbors > 0 and (healing_neighbors + virus_neighbors) <= 5:
+                one2[row][col] = 5
+            elif one1[row][col] == 0 and neitral_neighbors > 0 and virus_neighbors == 1 and healing_neighbors == 0:
+                one2[row][col] = 5
             elif (base_neighbors == 3 or base_neighbors == 2) and one1[row][col] == 1 and virus_neighbors == 0 and neitral_neighbors == 0:
                 one2[row][col] = 1
             elif (base_neighbors > 3 or base_neighbors < 2) and one1[row][col] == 1 and virus_neighbors == 0 and neitral_neighbors == 0:
@@ -171,16 +172,16 @@ def check(one1, one2):
                 one2[row][col] = 5
             elif (friendly_neighbors == 3 or friendly_neighbors == 2) and one1[row][col] == 2 and (temperature <= high_border_friendly) and (temperature >= low_border_friendly) and neitral_neighbors > 0:
                 one2[row][col] = 5
-            elif virus_neighbors == 3 and one1[row][col] == 0 and (temperature <= high_border_virus) and (temperature >= high_border_virus) and healing_neighbors == 0:
+            elif virus_neighbors == 3 and one1[row][col] == 0 and healing_neighbors == 0:
                 one2[row][col] = 3
-            elif (virus_neighbors == 3 or virus_neighbors == 2) and one1[row][col] == 3 and (temperature <= high_border_virus) and (temperature >= high_border_virus) and healing_neighbors == 0:
+            elif (virus_neighbors == 3 or virus_neighbors == 2) and one1[row][col] == 3 and healing_neighbors == 0:
                 one2[row][col] = 3
-            elif (virus_neighbors > 3 or virus_neighbors < 2) and one1[row][col] == 3 and (temperature <= high_border_virus) and (temperature >= high_border_virus) and healing_neighbors == 0:
+            elif (virus_neighbors > 3 or virus_neighbors < 2) and one1[row][col] == 3 and healing_neighbors == 0:
                 one2[row][col] = 0
-            elif virus_neighbors == 3 and one1[row][col] == 0 and (temperature <= high_border_virus) and (temperature >= high_border_virus) and healing_neighbors > 0:
-                one2[row][col] = 5
-            elif (virus_neighbors == 3 or virus_neighbors == 2) and one1[row][col] == 3 and (temperature <= high_border_virus) and (temperature >= high_border_virus) and healing_neighbors > 0:
-                one2[row][col] = 5
+            elif virus_neighbors == 3 and one1[row][col] == 0 and healing_neighbors > 0:
+                one1[row][col] = 5
+            elif (virus_neighbors == 3 or virus_neighbors == 2) and one1[row][col] == 3 and healing_neighbors > 0:
+                one1[row][col] = 5
             elif healing_neighbors == 3 and one1[row][col] == 0 and (temperature <= high_border_healer) and (temperature >= low_border_healer):
                 one2[row][col] = 4
             elif (healing_neighbors == 3 or healing_neighbors == 2) and one1[row][col] == 4 and (temperature <= high_border_healer) and (temperature >= low_border_healer):
@@ -189,7 +190,7 @@ def check(one1, one2):
                 one2[row][col] = 0
             elif neitral_neighbors == 3 and one1[row][col] == 0:
                 one2[row][col] = 5
-            elif (neitral_neighbors == 3 or neitral_neighbors == 2) and one1[row][col] == 5:
+            elif (neitral_neighbors <= 3 and neitral_neighbors >= 2) and one1[row][col] == 5:
                 one2[row][col] = 5
             elif (neitral_neighbors > 3 or neitral_neighbors < 2) and one1[row][col] == 5:
                 one2[row][col] = 0
